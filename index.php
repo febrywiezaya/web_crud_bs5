@@ -2,8 +2,19 @@
 session_start();
 include('koneksi.php');
 
-$sql = $con->query("SELECT * FROM mahasiswa");
-$datas = $sql->fetch_all(MYSQLI_ASSOC);
+
+if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET['cari']) && $_GET['cari'] != null) {
+    // $cari = "%" . htmlspecialchars($_GET['cari']) . "%"; WITHOUT CONCAT USE THIS.
+    $cari = htmlspecialchars($_GET['cari']);
+
+    $sql = $con->prepare("SELECT * FROM mahasiswa WHERE nama LIKE CONCAT('%',?,'%') OR npm LIKE CONCAT('%',?,'%') OR jurusan LIKE CONCAT('%',?,'%')");
+    $sql->bind_param("sss", $cari, $cari, $cari);
+    $sql->execute();
+    $datas = $sql->get_result()->fetch_all(MYSQLI_ASSOC);
+} else {
+    $sql = $con->query("SELECT * FROM mahasiswa");
+    $datas = $sql->fetch_all(MYSQLI_ASSOC);
+}
 
 // Pengkondisian Tambah
 if (isset($_SESSION['tambah']) && $_SESSION['tambah'] == "yes") {
@@ -36,7 +47,20 @@ $con->close();
 
 <h1>Tabel Mahasiswa</h1>
 
-<a class="btn btn-primary" href="tambah.php">Tambah Data</a>
+<div class="row">
+    <div class="col-6">
+        <a class="btn btn-primary" href="tambah.php">Tambah Data</a>
+    </div>
+
+    <div class="col-6">
+        <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="GET">
+            <div class="input-group mb-3">
+                <input name="cari" type="text" class="form-control" placeholder="Masukkan pencarian..">
+                <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -45,7 +69,7 @@ $con->close();
             <th>Nama</th>
             <th>NPM</th>
             <th>Jurusan</th>
-            <th>Tombol Aksi</th>
+            <th>Tombol Opsi</th>
         </tr>
     </thead>
     <tbody>
