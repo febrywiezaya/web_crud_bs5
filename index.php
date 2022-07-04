@@ -60,7 +60,7 @@ $con->close();
                 <td><?= $data['jurusan']; ?></td>
                 <td>
                     <a class="btn btn-warning" href="edit.php?id=<?= $data['id']; ?>">EDIT</a>
-                    <a class="btn btn-danger" href="hapus.php?id=<?= $data['id']; ?>">HAPUS</a>
+                    <a class="btn btn-danger" onclick="confirm('Yakin hapus data ini?')" href="hapus.php?id=<?= $data['id']; ?>">HAPUS</a>
                 </td>
             </tr>
         <?php
